@@ -16,7 +16,7 @@ namespace Redwood.Framework.Hosting
         public string GetMarkupFileVirtualPath(RedwoodRequestContext context)
         {
             // get file name
-            var fileName = context.Route != null ? context.Route.VirtualPath : context.OwinContext.Request.Uri.LocalPath;
+            var fileName = context.Route != null ? context.Route.VirtualPath : context.HttpContext.Request.Path.ToString();
             if (!fileName.EndsWith(MarkupFile.ViewFileExtension, StringComparison.CurrentCultureIgnoreCase))
             {
                 throw new Exception("The view must be a file with the .rwhtml extension!");     // TODO: exception handling

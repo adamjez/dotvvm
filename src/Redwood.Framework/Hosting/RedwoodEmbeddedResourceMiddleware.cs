@@ -4,7 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Http;
 using Redwood.Framework.Parser;
 
 namespace Redwood.Framework.Hosting
@@ -12,13 +13,16 @@ namespace Redwood.Framework.Hosting
     /// <summary>
     /// Provides access to embedded resources in the Redwood.Framework assembly.
     /// </summary>
-    public class RedwoodEmbeddedResourceMiddleware : OwinMiddleware
+    public class RedwoodEmbeddedResourceMiddleware
     {
-        public RedwoodEmbeddedResourceMiddleware(OwinMiddleware next) : base(next)
+        public RequestDelegate Next { get; private set; }
+
+        public RedwoodEmbeddedResourceMiddleware(RequestDelegate next)
         {
+            Next = next;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(HttpContext context)
         {
             // try resolve the route
             var url = context.Request.Path.Value.TrimStart('/').TrimEnd('/');
@@ -46,12 +50,12 @@ namespace Redwood.Framework.Hosting
         /// <summary>
         /// Renders the embedded resource.
         /// </summary>
-        private void RenderEmbeddedResource(IOwinContext context)
+        private void RenderEmbeddedResource(HttpContext context)
         {
             context.Response.StatusCode = (int)HttpStatusCode.OK;
 
             var resourceName = context.Request.Query["name"];
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == context.Request.Query["assembly"]);
+            var assembly = Assembly.Load(new AssemblyName(context.Request.Query["assembly"]));
 
             if (resourceName.EndsWith(".js"))
             {

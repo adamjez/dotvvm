@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNet.Http;
 using Redwood.Framework.Controls.Infrastructure;
 using Redwood.Framework.Hosting;
 using Redwood.Framework.Storage;
@@ -18,10 +18,10 @@ namespace Redwood.Framework.Runtime
 
         Task WriteViewModelResponse(RedwoodRequestContext context, RedwoodView view);
 
-        Task RenderPlainJsonResponse(IOwinContext context, object data);
+        Task RenderPlainJsonResponse(HttpContext context, object data);
 
-        Task RenderHtmlResponse(IOwinContext context, string html);
+        Task RenderHtmlResponse(HttpContext context, string html);
 
-        Task RenderPlainTextResponse(IOwinContext context, string text);
+        Task RenderPlainTextResponse(HttpContext context, string text);
     }
 }

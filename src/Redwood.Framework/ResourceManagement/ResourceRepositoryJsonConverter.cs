@@ -24,7 +24,7 @@ namespace Redwood.Framework.ResourceManagement
         static Dictionary<string, Type> GetResourceCollectionNames()
         {
             var dict = new Dictionary<string, Type>();
-            var redwoodAssembly = typeof(RedwoodConfiguration).Assembly.FullName;
+            var redwoodAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.FullName;
             var resourceBaseType = typeof(ResourceBase);
             // for each type derived from ResourceBase
             foreach (var type in AppDomain.CurrentDomain.GetAssemblies()

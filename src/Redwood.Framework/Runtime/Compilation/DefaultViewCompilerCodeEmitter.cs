@@ -90,7 +90,7 @@ namespace Redwood.Framework.Runtime.Compilation
         /// </summary>
         public string EmitCreateObject(Type type, object[] constructorArguments = null)
         {
-            usedAssemblies.Add(type.Assembly);
+            usedAssemblies.Add(type.GetTypeInfo().Assembly);
             return EmitCreateObject(type.FullName, constructorArguments);
         }
 
@@ -184,7 +184,7 @@ namespace Redwood.Framework.Runtime.Compilation
             }
 
             var type = value.GetType();
-            if (type.IsEnum)
+            if (type.GetTypeInfo().IsEnum)
             {
                 return
                     SyntaxFactory.MemberAccessExpression(

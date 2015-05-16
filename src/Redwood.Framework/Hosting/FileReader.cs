@@ -9,6 +9,7 @@ namespace Redwood.Framework.Hosting
 {
     public class FileReader : IReader
     {
+        private FileStream fileStream;
         private StreamReader streamReader;
         private char currentChar = RwHtmlTokenizer.NullChar;
         private int position = 0;
@@ -18,7 +19,8 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public FileReader(string fileName)
         {
-            streamReader = new StreamReader(fileName, true);
+            fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            streamReader = new StreamReader(fileStream, true);
             ReadCore();
         }
 
@@ -50,6 +52,10 @@ namespace Redwood.Framework.Hosting
             if (streamReader != null)
             {
                 streamReader.Dispose();
+            }
+            if (fileStream != null)
+            {
+                fileStream.Dispose();
             }
         }
     }

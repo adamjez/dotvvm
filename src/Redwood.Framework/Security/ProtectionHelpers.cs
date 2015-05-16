@@ -9,12 +9,12 @@ namespace Redwood.Framework.Security
     {
         public static string GetRequestIdentity(RedwoodRequestContext context)
         {
-            return context.OwinContext.Request.Uri.ToString();
+            return context.HttpContext.Request.GetAbsoluteUrl().ToString();
         }
 
         public static string GetUserIdentity(RedwoodRequestContext context)
         {
-            var user = context.OwinContext.Request.User;
+            var user = context.HttpContext.User;
             var userIdentity = user != null && user.Identity.IsAuthenticated ? user.Identity.Name : null;
             return userIdentity;
         }

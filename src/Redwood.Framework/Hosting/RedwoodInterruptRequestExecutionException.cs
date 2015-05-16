@@ -7,7 +7,7 @@ namespace Redwood.Framework.Hosting
     /// <summary>
     /// An exception which is used to interrupt the request processing pipeline because the response has already been generated.
     /// </summary>
-    public class RedwoodInterruptRequestExecutionException : ApplicationException
+    public class RedwoodInterruptRequestExecutionException : Exception
     {
 
         public RedwoodInterruptRequestExecutionException()

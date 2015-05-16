@@ -5,7 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using Microsoft.Owin;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Http;
 using Newtonsoft.Json.Linq;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Controls;
@@ -21,9 +22,9 @@ namespace Redwood.Framework.Hosting
         internal string CsrfToken { get; set; }
 
         /// <summary>
-        /// Gets the underlying <see cref="IOwinContext"/> object for this HTTP request.
+        /// Gets the underlying <see cref="HttpContext"/> object for this HTTP request.
         /// </summary>
-        public IOwinContext OwinContext { get; internal set; }
+        public HttpContext HttpContext { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="IRedwoodPresenter"/> that is responsible for handling this HTTP request.
@@ -80,7 +81,7 @@ namespace Redwood.Framework.Hosting
         {
             get
             {
-                return OwinContext.Request.Query;
+                return HttpContext.Request.Query;
             }
         }
 
@@ -95,7 +96,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public bool IsSpaRequest
         {
-            get { return RedwoodPresenter.DetermineSpaRequest(OwinContext); }
+            get { return RedwoodPresenter.DetermineSpaRequest(HttpContext); }
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public bool IsInPartialRenderingMode
         {
-            get { return RedwoodPresenter.DeterminePartialRendering(OwinContext); }
+            get { return RedwoodPresenter.DeterminePartialRendering(HttpContext); }
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public string GetSpaContentPlaceHolderUniqueId()
         {
-            return RedwoodPresenter.DetermineSpaContentPlaceHolderUniqueId(OwinContext);
+            return RedwoodPresenter.DetermineSpaContentPlaceHolderUniqueId(HttpContext);
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public void ChangeCurrentCulture(string cultureName)
         {
-            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(cultureName);
+            CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = new CultureInfo(cultureName);
         }
 
         /// <summary>
@@ -144,7 +145,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public void Redirect(string url)
         {
-            SetRedirectResponse(OwinContext, url, (int)HttpStatusCode.Redirect);
+            SetRedirectResponse(HttpContext, url, (int)HttpStatusCode.Redirect);
             InterruptRequest();
         }
 
@@ -163,7 +164,7 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public void RedirectPermanent(string url)
         {
-            SetRedirectResponse(OwinContext, url, (int)HttpStatusCode.MovedPermanently);
+            SetRedirectResponse(HttpContext, url, (int)HttpStatusCode.MovedPermanently);
             InterruptRequest();
         }
 
@@ -180,7 +181,7 @@ namespace Redwood.Framework.Hosting
         /// <summary>
         /// Renders the redirect response.
         /// </summary>
-        public static void SetRedirectResponse(IOwinContext OwinContext, string url, int statusCode)
+        public static void SetRedirectResponse(HttpContext OwinContext, string url, int statusCode)
         {
             if (!RedwoodPresenter.DeterminePartialRendering(OwinContext))
             {
@@ -191,7 +192,7 @@ namespace Redwood.Framework.Hosting
             {
                 OwinContext.Response.StatusCode = 200;
                 OwinContext.Response.ContentType = "application/json";
-                OwinContext.Response.Write(DefaultViewModelSerializer.GenerateRedirectActionResponse(url));
+                Task.Run(async () => await OwinContext.Response.WriteAsync(DefaultViewModelSerializer.GenerateRedirectActionResponse(url)));
             }
         }
 
@@ -203,8 +204,8 @@ namespace Redwood.Framework.Hosting
         {
             if (!ModelState.IsValid)
             {
-                OwinContext.Response.ContentType = "application/json";
-                OwinContext.Response.Write(Presenter.ViewModelSerializer.SerializeModelState(this));
+                HttpContext.Response.ContentType = "application/json";
+                Task.Run(async () => await HttpContext.Response.WriteAsync(Presenter.ViewModelSerializer.SerializeModelState(this)));
                 throw new RedwoodInterruptRequestExecutionException("The ViewModel contains validation errors!");
             }
         }

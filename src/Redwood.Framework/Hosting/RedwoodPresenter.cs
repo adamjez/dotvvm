@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNet.Http;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Controls;
 using Redwood.Framework.Controls.Infrastructure;
@@ -85,20 +85,20 @@ namespace Redwood.Framework.Hosting
             if (failedAsUnauthorized)
             {
                 // unauthorized error
-                context.OwinContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await RedwoodErrorPageMiddleware.RenderErrorResponse(context.OwinContext, exception);
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                await RedwoodErrorPageMiddleware.RenderErrorResponse(context.HttpContext, exception);
             }
         }
 
         public async Task ProcessRequestCore(RedwoodRequestContext context)
         {
-            if (context.OwinContext.Request.Method != "GET" && context.OwinContext.Request.Method != "POST")
+            if (context.HttpContext.Request.Method != "GET" && context.HttpContext.Request.Method != "POST")
             {
                 // unknown HTTP method
-                context.OwinContext.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
                 throw new RedwoodHttpException("Only GET and POST methods are supported!");
             }
-            var isPostBack = DetermineIsPostBack(context.OwinContext);
+            var isPostBack = DetermineIsPostBack(context.HttpContext);
             context.IsPostBack = isPostBack;
             context.ChangeCurrentCulture(context.Configuration.DefaultCulture);
 
@@ -117,7 +117,7 @@ namespace Redwood.Framework.Hosting
 
             // get action filters
             var globalFilters = context.Configuration.Runtime.GlobalFilters.ToList();
-            var viewModelFilters = context.ViewModel.GetType().GetCustomAttributes<ActionFilterAttribute>(true).ToList();
+            var viewModelFilters = context.ViewModel.GetType().GetTypeInfo().GetCustomAttributes<ActionFilterAttribute>(true).ToList();
 
             // run OnViewModelCreated on action filters
             foreach (var filter in globalFilters.Concat(viewModelFilters))
@@ -147,7 +147,7 @@ namespace Redwood.Framework.Hosting
             {
                 // perform the postback
                 string postData;
-                using (var sr = new StreamReader(context.OwinContext.Request.Body))
+                using (var sr = new StreamReader(context.HttpContext.Request.Body))
                 {
                     postData = await sr.ReadToEndAsync();
                 }
@@ -254,22 +254,22 @@ namespace Redwood.Framework.Hosting
             }
         }
 
-        public static bool DetermineIsPostBack(IOwinContext context)
+        public static bool DetermineIsPostBack(HttpContext context)
         {
             return context.Request.Method == "POST";
         }
 
-        public static bool DetermineSpaRequest(IOwinContext context)
+        public static bool DetermineSpaRequest(HttpContext context)
         {
             return !string.IsNullOrEmpty(context.Request.Headers[Constants.SpaContentPlaceHolderHeaderName]);
         }
 
-        public static bool DeterminePartialRendering(IOwinContext context)
+        public static bool DeterminePartialRendering(HttpContext context)
         {
             return DetermineIsPostBack(context) || DetermineSpaRequest(context);
         }
 
-        public static string DetermineSpaContentPlaceHolderUniqueId(IOwinContext context)
+        public static string DetermineSpaContentPlaceHolderUniqueId(HttpContext context)
         {
             return context.Request.Headers[Constants.SpaContentPlaceHolderHeaderName];
         }

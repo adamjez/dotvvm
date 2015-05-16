@@ -47,7 +47,7 @@ namespace Redwood.Framework.Security {
 
             // Prepare AES-256 in CBC mode
             byte[] iv, encryptedData, signatureData;
-            using (var aes = new RijndaelManaged()) {
+            using (var aes = Aes.Create()) {
                 aes.Key = derivedEncKey;
                 aes.BlockSize = 128;
                 aes.Mode = CipherMode.CBC;
@@ -131,7 +131,7 @@ namespace Redwood.Framework.Security {
             }
 
             // Decrypt data
-            using (var aes = new RijndaelManaged()) {
+            using (var aes = Aes.Create()) {
                 // Prepare AES 256
                 aes.Key = derivedEncKey;
                 aes.BlockSize = 128;

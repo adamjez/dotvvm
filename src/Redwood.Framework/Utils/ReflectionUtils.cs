@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Redwood.Framework.Utils
 {
@@ -61,11 +62,11 @@ namespace Redwood.Framework.Utils
         public static object ConvertValue(object value, Type type)
         {
             // handle null values
-            if ((value == null) && (type.IsValueType))
+            if ((value == null) && (type.GetTypeInfo().IsValueType))
                 return Activator.CreateInstance(type);
 
             // handle nullable types
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 if ((value is string) && ((string)value == string.Empty))
                 {
@@ -86,7 +87,7 @@ namespace Redwood.Framework.Utils
             if (type == typeof(object)) return value;
 
             // handle enums
-            if (type.IsEnum && value is string)
+            if (type.GetTypeInfo().IsEnum && value is string)
             {
                 try
                 {

@@ -299,10 +299,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Redwood.Framework\Redwood.Framework.csproj">
-      <Project>{2865b545-e469-417a-b14f-e2ccdd4b6267}</Project>
-      <Name>Redwood.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Redwood.VS2015Extension.ProjectTemplate\Redwood.VS2015Extension.ProjectTemplate.csproj">
       <Project>{C1FE66D8-208E-4874-B6D3-7D37E0F5CAED}</Project>
       <Name>Redwood.VS2015Extension.ProjectTemplate</Name>

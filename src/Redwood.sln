@@ -16,8 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VisualStudio", "VisualStudio", "{0BD7B542-16CE-40C8-9B2D-D3D2C6A3E5FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redwood.Framework", "Redwood.Framework\Redwood.Framework.csproj", "{2865B545-E469-417A-B14F-E2CCDD4B6267}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redwood.Framework.Tests", "Redwood.Framework.Tests\Redwood.Framework.Tests.csproj", "{7C2EABF3-F594-4FCB-8DD9-EDA1E4DF1C24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redwood.Samples.BasicSamples", "Redwood.Samples.BasicSamples\Redwood.Samples.BasicSamples.csproj", "{BDF78B2F-9C1F-4481-B80A-1537139994F4}"
@@ -44,16 +42,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redwood.Framework.Tools", "
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Redwood.Samples.CanopyTests", "Redwood.Samples.CanopyTests\Redwood.Samples.CanopyTests.fsproj", "{A960AFE7-0D02-458D-A895-29E7A251C3DB}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Redwood.Framework", "Redwood.Framework\Redwood.Framework.xproj", "{F1735B47-938E-419B-8E04-E90CE15444CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2865B545-E469-417A-B14F-E2CCDD4B6267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2865B545-E469-417A-B14F-E2CCDD4B6267}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2865B545-E469-417A-B14F-E2CCDD4B6267}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2865B545-E469-417A-B14F-E2CCDD4B6267}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C2EABF3-F594-4FCB-8DD9-EDA1E4DF1C24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C2EABF3-F594-4FCB-8DD9-EDA1E4DF1C24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C2EABF3-F594-4FCB-8DD9-EDA1E4DF1C24}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -102,6 +98,10 @@ Global
 		{A960AFE7-0D02-458D-A895-29E7A251C3DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A960AFE7-0D02-458D-A895-29E7A251C3DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A960AFE7-0D02-458D-A895-29E7A251C3DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1735B47-938E-419B-8E04-E90CE15444CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1735B47-938E-419B-8E04-E90CE15444CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1735B47-938E-419B-8E04-E90CE15444CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1735B47-938E-419B-8E04-E90CE15444CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

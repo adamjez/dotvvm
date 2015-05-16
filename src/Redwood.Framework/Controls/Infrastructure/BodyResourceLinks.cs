@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Redwood.Framework.Configuration;
@@ -36,7 +37,7 @@ namespace Redwood.Framework.Controls.Infrastructure
 
             // init on load
             writer.RenderBeginTag("script");
-            writer.WriteUnencodedText(string.Format("redwood.onDocumentReady(function () {{ redwood.init('{0}', '{1}'); }});", context.CurrentPageArea, Thread.CurrentThread.CurrentUICulture.Name));
+            writer.WriteUnencodedText(string.Format("redwood.onDocumentReady(function () {{ redwood.init('{0}', '{1}'); }});", context.CurrentPageArea, CultureInfo.CurrentUICulture.Name));
             writer.RenderEndTag();
         }
     }

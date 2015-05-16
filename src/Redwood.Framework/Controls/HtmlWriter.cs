@@ -143,7 +143,7 @@ namespace Redwood.Framework.Controls
         /// </summary>
         public void WriteText(string text)
         {
-            WebUtility.HtmlEncode(text, writer);
+            writer.Write(WebUtility.HtmlEncode(text));
         }
 
         /// <summary>

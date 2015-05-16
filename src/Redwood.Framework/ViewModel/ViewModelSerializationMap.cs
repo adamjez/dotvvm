@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Redwood.Framework.Runtime;
 
 namespace Redwood.Framework.ViewModel
@@ -230,14 +231,14 @@ namespace Redwood.Framework.ViewModel
             return ex.Compile();
         }
 
-        private static readonly string RedwoodAssemblyName = typeof(ViewModelSerializationMap).Assembly.FullName;
+        private static readonly string RedwoodAssemblyName = typeof(ViewModelSerializationMap).GetTypeInfo().Assembly.FullName;
         private bool ShouldCheckEncrypedValueCount(Type type)
         {
             return !(
-                type.IsPrimitive ||
+                type.GetTypeInfo().IsPrimitive ||
                 type == typeof(string) ||
                 (typeof(IEnumerable<>).IsAssignableFrom(type) && ShouldCheckEncrypedValueCount(type.GenericTypeArguments[0])) ||
-                (type.Assembly.GetReferencedAssemblies().All(a => a.FullName != RedwoodAssemblyName) &&
+                (type.GetTypeInfo().Assembly.GetReferencedAssemblies().All(a => a.FullName != RedwoodAssemblyName) &&
                     !type.GenericTypeArguments.Any(ShouldCheckEncrypedValueCount))
            );
         }

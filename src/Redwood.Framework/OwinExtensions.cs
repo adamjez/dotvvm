@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
+using Microsoft.AspNet.Builder;
 using Newtonsoft.Json;
-using Owin;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Hosting;
 
@@ -10,7 +10,7 @@ namespace Redwood.Framework
     public static class OwinExtensions
     {
 
-        public static RedwoodConfiguration UseRedwood(this IAppBuilder app, string applicationRootDirectory, string virtualDirectory = "")
+        public static RedwoodConfiguration UseRedwood(this IApplicationBuilder app, string applicationRootDirectory, string virtualDirectory = "")
         {
             if (virtualDirectory.StartsWith("/"))
             {
@@ -29,16 +29,16 @@ namespace Redwood.Framework
             configuration.ApplicationPhysicalPath = applicationRootDirectory;
             configuration.VirtualDirectory = virtualDirectory;
             configuration.Markup.AddAssembly(Assembly.GetCallingAssembly().FullName);
-
+            
             // add middlewares
-            app.Use<RedwoodErrorPageMiddleware>();
+            app.UseMiddleware<RedwoodErrorPageMiddleware>();
 
-            app.Use<RedwoodRestrictedStaticFilesMiddleware>();
-            app.Use<RedwoodEmbeddedResourceMiddleware>();
-            app.Use<RedwoodFileUploadMiddleware>(configuration);
-            app.Use<JQueryGlobalizeCultureMiddleware>();
+            app.UseMiddleware<RedwoodRestrictedStaticFilesMiddleware>();
+            app.UseMiddleware<RedwoodEmbeddedResourceMiddleware>();
+            app.UseMiddleware<RedwoodFileUploadMiddleware>(configuration);
+            app.UseMiddleware<JQueryGlobalizeCultureMiddleware>();
 
-            app.Use<RedwoodMiddleware>(configuration);
+            app.UseMiddleware<RedwoodMiddleware>(configuration);
             
             return configuration;
         }

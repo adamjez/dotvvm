@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Http;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.ResourceManagement;
 
@@ -11,24 +12,26 @@ namespace Redwood.Framework.Hosting
     /// <summary>
     /// A middleware that handles Redwood HTTP requests.
     /// </summary>
-    public class RedwoodMiddleware : OwinMiddleware
+    public class RedwoodMiddleware 
     {
         private readonly RedwoodConfiguration configuration;
 
         private const string GooglebotHashbangEscapedFragment = "_escaped_fragment_=";
+        public RequestDelegate Next { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedwoodMiddleware"/> class.
         /// </summary>
-        public RedwoodMiddleware(OwinMiddleware next, RedwoodConfiguration configuration) : base(next)
+        public RedwoodMiddleware(RequestDelegate next, RedwoodConfiguration configuration)
         {
+            Next = next;
             this.configuration = configuration;
         }
 
         /// <summary>
         /// Process an individual request.
         /// </summary>
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(HttpContext context)
         {
             // attempt to translate Googlebot hashbang espaced fragment URL to a plain URL string.
             string url;
@@ -56,7 +59,7 @@ namespace Redwood.Framework.Hosting
                     await route.ProcessRequest(new RedwoodRequestContext()
                     {
                         Route = route,
-                        OwinContext = context,
+                        HttpContext = context,
                         Configuration = configuration,
                         Parameters = parameters,
                         ResourceManager = new ResourceManager(configuration)

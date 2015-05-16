@@ -50,7 +50,7 @@ namespace Redwood.Framework.Runtime.Filters
         public void Authorize(RedwoodRequestContext context)
         {
             // the user must not be anonymous
-            if (context.OwinContext.Request.User == null || !context.OwinContext.Request.User.Identity.IsAuthenticated)
+            if (context.HttpContext.User == null || !context.HttpContext.User.Identity.IsAuthenticated)
             {
                 throw new UnauthorizedAccessException();
             }
@@ -58,7 +58,7 @@ namespace Redwood.Framework.Runtime.Filters
             // if the role is set
             if (Roles != null && Roles.Length > 0)
             {
-                if (!Roles.Any(r => context.OwinContext.Request.User.IsInRole(r)))
+                if (!Roles.Any(r => context.HttpContext.User.IsInRole(r)))
                 {
                     throw new UnauthorizedAccessException();
                 }

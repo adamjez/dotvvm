@@ -5,7 +5,8 @@ using System.Security;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Owin.Infrastructure;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Security.Cookies.Infrastructure;
 using Redwood.Framework.Hosting;
 
 namespace Redwood.Framework.Security
@@ -81,26 +82,28 @@ namespace Redwood.Framework.Security
             var keyHelper = new ApplicationKeyHelper(context.Configuration.Security);
 
             // Get cookie value
-            var sidCookieValue = mgr.GetRequestCookie(context.OwinContext, context.Configuration.Security.SessionIdCookieName);
+            var sidCookieValue = mgr.GetRequestCookie(context.HttpContext, context.Configuration.Security.SessionIdCookieName);
 
             if (string.IsNullOrWhiteSpace(sidCookieValue))
             {
                 // No SID - generate and protect new one
-                var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
                 var sid = new byte[SID_LENGTH];
-                rng.GetBytes(sid);
+                using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+                {
+                    rng.GetBytes(sid);
+                }
                 var protectedSid = keyHelper.ProtectData(sid, KDF_LABEL_SID);
 
                 // Save to cookie
                 sidCookieValue = Convert.ToBase64String(protectedSid);
                 mgr.AppendResponseCookie(
-                    context.OwinContext,
+                    context.HttpContext,
                     context.Configuration.Security.SessionIdCookieName, // Configured cookie name
                     sidCookieValue,                                     // Base64-encoded SID value
-                    new Microsoft.Owin.CookieOptions
+                    new CookieOptions
                     {
                         HttpOnly = true,                                // Don't allow client script access
-                        Secure = context.OwinContext.Request.IsSecure   // If request goes trough HTTPS, mark as secure only
+                        Secure = context.HttpContext.Request.IsHttps   // If request goes trough HTTPS, mark as secure only
                     });
 
                 // Return newly generated SID

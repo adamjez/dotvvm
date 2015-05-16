@@ -128,16 +128,16 @@ namespace Redwood.Framework.Runtime.Compilation
                 // static references
                 var staticReferences = new[]
                 {
-                    typeof(object).Assembly,
-                    typeof(RuntimeBinderException).Assembly,
-                    typeof(System.Runtime.CompilerServices.DynamicAttribute).Assembly,
+                    typeof(object).GetTypeInfo().Assembly,
+                    typeof(RuntimeBinderException).GetTypeInfo().Assembly,
+                    typeof(System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly,
                     Assembly.GetExecutingAssembly()
                 }
-                .Concat(configuration.Markup.Assemblies.Select(Assembly.Load)).Distinct()
+                .Concat(configuration.Markup.Assemblies.Select(a => Assembly.Load(new AssemblyName(a)))).Distinct()
                 .Select(MetadataReference.CreateFromAssembly);
                 
                 // add dynamic references
-                var dynamicReferences = emitter.UsedControlBuilderTypes.Select(t => t.Assembly).Concat(emitter.UsedAssemblies).Distinct()
+                var dynamicReferences = emitter.UsedControlBuilderTypes.Select(t => t.GetTypeInfo().Assembly).Concat(emitter.UsedAssemblies).Distinct()
                     .Select(a => assemblyCache.GetAssemblyMetadata(a));
 
                 // compile

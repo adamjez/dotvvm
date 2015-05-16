@@ -5,8 +5,9 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.WebUtilities;
-using Microsoft.Owin;
 using Newtonsoft.Json;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Parser;
@@ -15,17 +16,19 @@ using Redwood.Framework.Storage;
 
 namespace Redwood.Framework.Hosting
 {
-    public class RedwoodFileUploadMiddleware : OwinMiddleware
+    public class RedwoodFileUploadMiddleware
     {
+        public RequestDelegate Next { get; set; }
         private readonly RedwoodConfiguration configuration;
 
 
-        public RedwoodFileUploadMiddleware(OwinMiddleware next, RedwoodConfiguration configuration) : base(next)
+        public RedwoodFileUploadMiddleware(RequestDelegate next, RedwoodConfiguration configuration)
         {
+            Next = next;
             this.configuration = configuration;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(HttpContext context)
         {
             // try resolve the route
             var url = context.Request.Path.Value.TrimStart('/').TrimEnd('/');
@@ -41,7 +44,7 @@ namespace Redwood.Framework.Hosting
             }
         }
 
-        private async Task ProcessMultipartRequest(IOwinContext context)
+        private async Task ProcessMultipartRequest(HttpContext context)
         {
             // verify the request
             var isPost = context.Request.Method == "POST";
@@ -78,7 +81,7 @@ namespace Redwood.Framework.Hosting
             await RenderResponse(context, isPost, errorMessage, uploadedFiles);
         }
 
-        private async Task RenderResponse(IOwinContext context, bool isPost, string errorMessage, List<UploadedFile> uploadedFiles)
+        private async Task RenderResponse(HttpContext context, bool isPost, string errorMessage, List<UploadedFile> uploadedFiles)
         {
             var outputRenderer = configuration.ServiceLocator.GetService<IOutputRenderer>();
             if (isPost && context.Request.Headers.Get(Constants.RedwoodFileUploadAsyncHeaderName) == "true")
@@ -116,7 +119,7 @@ namespace Redwood.Framework.Hosting
             }
         }
 
-        private async Task SaveFiles(IOwinContext context, Group boundary, List<UploadedFile> uploadedFiles)
+        private async Task SaveFiles(HttpContext context, Group boundary, List<UploadedFile> uploadedFiles)
         {
             // get the file store
             var fileStore = configuration.ServiceLocator.GetService<IUploadedFileStorage>();

@@ -197,7 +197,7 @@ namespace Redwood.Framework.Runtime
         /// </summary>
         private ControlResolverMetadata BuildControlMetadata(ControlType type)
         {
-            var attribute = type.Type.GetCustomAttribute<ControlMarkupOptionsAttribute>();
+            var attribute = type.Type.GetTypeInfo().GetCustomAttribute<ControlMarkupOptionsAttribute>();
 
             var metadata = new ControlResolverMetadata()
             {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Configuration;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Newtonsoft.Json;
 using Redwood.Framework.Hosting;
@@ -90,7 +91,7 @@ namespace Redwood.Framework.Configuration
         /// </summary>
         internal RedwoodConfiguration()
         {
-            DefaultCulture = Thread.CurrentThread.CurrentCulture.Name;
+            DefaultCulture = CultureInfo.CurrentCulture.Name;
             Markup = new RedwoodMarkupConfiguration();
             RouteTable = new RedwoodRouteTable(this);
             Resources = new RedwoodResourceRepository();
@@ -132,21 +133,21 @@ namespace Redwood.Framework.Configuration
                 {
                     CdnUrl = "https://code.jquery.com/jquery-2.1.1.min.js",
                     Url = "Redwood.Framework.Resources.Scripts.jquery-2.1.1.min.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     GlobalObjectName = "$"
                 });
             configuration.Resources.Register(Constants.KnockoutJSResourceName,
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.knockout-3.2.0.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     GlobalObjectName = "ko"
                 });
             configuration.Resources.Register(Constants.KnockoutMapperResourceName,
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.knockout.mapper.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     GlobalObjectName = "ko.mapper",
                     Dependencies = new[] { Constants.KnockoutJSResourceName }
                 });
@@ -154,7 +155,7 @@ namespace Redwood.Framework.Configuration
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.Redwood.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     GlobalObjectName = "redwood",
                     Dependencies = new[] { Constants.KnockoutJSResourceName, Constants.KnockoutMapperResourceName }
                 });
@@ -162,7 +163,7 @@ namespace Redwood.Framework.Configuration
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.Redwood.Validation.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     GlobalObjectName = "redwood.validation",
                     Dependencies = new[] { Constants.RedwoodResourceName }
                 });
@@ -170,7 +171,7 @@ namespace Redwood.Framework.Configuration
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.Redwood.Debug.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     Dependencies = new[] { Constants.RedwoodResourceName, Constants.JQueryResourceName }
                 });
             configuration.Resources.Register(Constants.BootstrapResourceName,
@@ -191,14 +192,14 @@ namespace Redwood.Framework.Configuration
                 new ScriptResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.Redwood.FileUpload.js",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     Dependencies = new[] { Constants.RedwoodResourceName }
                 });
             configuration.Resources.Register(Constants.RedwoodFileUploadCssResourceName,
                 new StylesheetResource()
                 {
                     Url = "Redwood.Framework.Resources.Scripts.Redwood.FileUpload.css",
-                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name,
+                    EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name,
                     Dependencies = new[] { Constants.RedwoodFileUploadResourceName }
                 });
 
@@ -213,7 +214,7 @@ namespace Redwood.Framework.Configuration
             configuration.Resources.Register(Constants.GlobalizeResourceName, new ScriptResource()
             {
                 Url = "Redwood.Framework.Resources.Scripts.Globalize.globalize.js",
-                EmbeddedResourceAssembly = typeof(RedwoodConfiguration).Assembly.GetName().Name
+                EmbeddedResourceAssembly = typeof(RedwoodConfiguration).GetTypeInfo().Assembly.GetName().Name
             });
 
 

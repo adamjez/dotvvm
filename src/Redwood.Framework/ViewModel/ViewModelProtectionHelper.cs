@@ -106,10 +106,12 @@ namespace Redwood.Framework.ViewModel
         /// </summary>
         protected static byte[] GenerateRandomKey(int length)
         {
-            var rng = RNGCryptoServiceProvider.Create();
-            var b = new byte[length];
-            rng.GetBytes(b);
-            return b;
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                var b = new byte[length];
+                rng.GetBytes(b);
+                return b;
+            }
         }
 
         /// <summary>
@@ -117,7 +119,7 @@ namespace Redwood.Framework.ViewModel
         /// </summary>
         protected virtual byte[] EncryptInternal(byte[] message, int offset, int length)
         {
-            using (var aes = new RijndaelManaged())
+            using (var aes = Aes.Create())
             {
                 aes.Key = EncryptionKey;
                 aes.GenerateIV();
@@ -157,7 +159,7 @@ namespace Redwood.Framework.ViewModel
                 ThrowSecurityException();
             }
 
-            using (var aes = new RijndaelManaged())
+            using (var aes = Aes.Create())
             {
                 aes.Key = EncryptionKey;
                 aes.Mode = CipherMode.CBC;

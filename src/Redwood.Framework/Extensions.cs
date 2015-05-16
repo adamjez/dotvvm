@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNet.Http;
 
 namespace Redwood.Framework
 {
@@ -17,6 +18,16 @@ namespace Redwood.Framework
                 }
                 yield return items[i];
             }
+        }
+
+        public static string GetPathAndQuery(this HttpRequest request)
+        {
+            return request.Path.ToString() + request.QueryString.ToString();
+        }
+
+        public static string GetAbsoluteUrl(this HttpRequest request)
+        {
+            return request.Protocol.ToString() + request.Host.ToString() + request.GetPathAndQuery();
         }
 
     }

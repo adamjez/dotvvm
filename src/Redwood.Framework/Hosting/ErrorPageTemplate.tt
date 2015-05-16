@@ -159,28 +159,31 @@ span.current-line { color: red; }
         try
         {
             var lines = new List<SourceLine>();
-            using (var sr = new StreamReader(FileName, true))
-            {
-                string line;
-                int lineNumber = 0;
-                while (!sr.EndOfStream && lineNumber < LineNumber + 2)
-                {
-                    line = sr.ReadLine();
-                    lineNumber++;
+			using (var fs = new FileStream(FileName, FileMode.Open, FileAccess.Read))
+			{
+				using (var sr = new StreamReader(fs, true))
+				{
+					string line;
+					int lineNumber = 0;
+					while (!sr.EndOfStream && lineNumber < LineNumber + 2)
+					{
+						line = sr.ReadLine();
+						lineNumber++;
 
-                    if (lineNumber >= LineNumber - 2)
-                    {
-                        // write the line to the output
-						lines.Add(new SourceLine() { LineNumber = lineNumber, Text = line });
+						if (lineNumber >= LineNumber - 2)
+						{
+							// write the line to the output
+							lines.Add(new SourceLine() { LineNumber = lineNumber, Text = line });
 
-						// mark the position on the problem line
-                        if (lineNumber == LineNumber)
-                        {
-                            lines.Add(new SourceLine() { Text = new string('-', PositionOnLine) + '^' });
-                        }
-                    }
-                }
-            }
+							// mark the position on the problem line
+							if (lineNumber == LineNumber)
+							{
+								lines.Add(new SourceLine() { Text = new string('-', PositionOnLine) + '^' });
+							}
+						}
+					}
+				}
+			}
             return lines;
         }
         catch

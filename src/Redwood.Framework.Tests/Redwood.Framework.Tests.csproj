@@ -182,10 +182,6 @@
     <Compile Include="VS2015Extension\MetadataControlResolverTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Redwood.Framework\Redwood.Framework.csproj">
-      <Project>{2865B545-E469-417A-B14F-E2CCDD4B6267}</Project>
-      <Name>Redwood.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Redwood.VS2015Extension\Redwood.VS2015Extension.csproj">
       <Project>{772e47bf-a251-44f7-92c4-157d9f083a6f}</Project>
       <Name>Redwood.VS2015Extension</Name>

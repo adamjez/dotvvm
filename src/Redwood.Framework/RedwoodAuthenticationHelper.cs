@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Owin;
+using Microsoft.AspNet.Http;
 using Redwood.Framework.Hosting;
 
 namespace Redwood.Framework
@@ -12,7 +12,7 @@ namespace Redwood.Framework
         /// <summary>
         /// Fixes the response created by the OWIN Security Challenge call to be accepted by Redwood client library.
         /// </summary>
-        public static void ApplyRedirectResponse(IOwinContext context, string redirectUri)
+        public static void ApplyRedirectResponse(HttpContext context, string redirectUri)
         {
             if (context.Response.StatusCode == 401)
             {

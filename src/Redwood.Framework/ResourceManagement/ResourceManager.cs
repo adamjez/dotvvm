@@ -5,6 +5,7 @@ using Redwood.Framework.Configuration;
 using Redwood.Framework.Parser;
 using System.Threading;
 using System.Collections.Immutable;
+using System.Globalization;
 
 namespace Redwood.Framework.ResourceManagement
 {
@@ -19,7 +20,7 @@ namespace Redwood.Framework.ResourceManagement
 
         public IReadOnlyCollection<string> RequiredResources
         {
-            get { return requiredResourcesOrdered.AsReadOnly(); }
+            get { return requiredResourcesOrdered; }
         }
 
         
@@ -98,7 +99,7 @@ namespace Redwood.Framework.ResourceManagement
         /// </summary>
         public void AddCurrentCultureGlobalizationResource()
         {
-            AddRequiredResource(string.Format(Constants.GlobalizeCultureResourceName, Thread.CurrentThread.CurrentCulture.Name));
+            AddRequiredResource(string.Format(Constants.GlobalizeCultureResourceName, CultureInfo.CurrentCulture.Name));
         }
 
 

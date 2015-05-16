@@ -1,20 +1,24 @@
-﻿using Microsoft.Owin;
-using Redwood.Framework.Parser;
+﻿using Redwood.Framework.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Http;
 
 namespace Redwood.Framework.Hosting
 {
-    public class RedwoodErrorPageMiddleware: OwinMiddleware
+    public class RedwoodErrorPageMiddleware
     {
-        public RedwoodErrorPageMiddleware(OwinMiddleware next) : base(next)
+        public RequestDelegate Next { get; private set; }
+
+        public RedwoodErrorPageMiddleware(RequestDelegate next)
         {
+            Next = next;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(HttpContext context)
         {
             Exception error = null;
             try
@@ -36,7 +40,7 @@ namespace Redwood.Framework.Hosting
         /// <summary>
         /// Renders the error response.
         /// </summary>
-        public static Task RenderErrorResponse(IOwinContext context, Exception error)
+        public static Task RenderErrorResponse(HttpContext context, Exception error)
         {
             context.Response.ContentType = "text/html";
 
@@ -45,9 +49,9 @@ namespace Redwood.Framework.Hosting
                 Exception = error,
                 ErrorCode = context.Response.StatusCode,
                 ErrorDescription = ((HttpStatusCode)context.Response.StatusCode).ToString(),
-                IpAddress = context.Request.RemoteIpAddress,
-                CurrentUserName = context.Request.User != null ? context.Request.User.Identity.Name : "",
-                Url = context.Request.Uri.ToString(),
+                IpAddress = context.GetFeature<IHttpConnectionFeature>().RemoteIpAddress.ToString(),
+                CurrentUserName = context.User != null ? context.User.Identity.Name : "",
+                Url = context.Request.GetAbsoluteUrl(),
                 Verb = context.Request.Method
             };
             if (error is ParserException)

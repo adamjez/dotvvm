@@ -98,7 +98,7 @@ namespace Redwood.Framework.Utils
         {
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (node.Member.MemberType == MemberTypes.Property)
+                if (node.Member is PropertyInfo)
                 {
                     var i = Visit(node.Expression);
                     if (i.NodeType == ExpressionType.Constant)
@@ -110,7 +110,7 @@ namespace Redwood.Framework.Utils
                     }
                     else return node;
                 }
-                else if (node.Member.MemberType == MemberTypes.Field)
+                else if (node.Member is FieldInfo)
                 {
                     var i = Visit(node.Expression);
                     if (i.NodeType == ExpressionType.Constant)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -52,7 +53,7 @@ namespace Redwood.Framework.ViewModel
             // handle null keyword
             if (reader.TokenType == JsonToken.Null)
             {
-                if (objectType.IsValueType)
+                if (objectType.GetTypeInfo().IsValueType)
                     throw new InvalidOperationException(string.Format("Recieved NULL for value type. Path: " + reader.Path));
 
                 return null;
@@ -96,12 +97,12 @@ namespace Redwood.Framework.ViewModel
 
         public static bool IsNullableType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
         public static bool IsEnum(Type type)
         {
-            return type.IsEnum;
+            return type.GetTypeInfo().IsEnum;
         }
 
         public static bool IsComplexType(Type type)
