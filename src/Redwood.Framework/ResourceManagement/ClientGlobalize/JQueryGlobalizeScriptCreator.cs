@@ -205,7 +205,7 @@ namespace Redwood.Framework.ResourceManagement.ClientGlobalize
                 nativeName = ci.NativeName,
                 englishName = ci.EnglishName,
                 isRTL = ci.TextInfo.IsRightToLeft,
-                language = ci.Name
+                language = ci.TwoLetterISOLanguageName
             };
             var jobj = JObject.FromObject(cultureInfoClientObj);
 
