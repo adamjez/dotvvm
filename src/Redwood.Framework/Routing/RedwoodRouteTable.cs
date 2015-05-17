@@ -32,7 +32,7 @@ namespace Redwood.Framework.Routing
         /// </summary>
         public IRedwoodPresenter GetDefaultPresenter()
         {
-            return configuration.ServiceLocator.GetService<IRedwoodPresenter>();
+            return configuration.ServiceProvider.GetService<IRedwoodPresenter>();
         }
 
         /// <summary>

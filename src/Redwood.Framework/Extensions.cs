@@ -30,5 +30,9 @@ namespace Redwood.Framework
             return request.Protocol.ToString() + request.Host.ToString() + request.GetPathAndQuery();
         }
 
+        public static T GetService<T>(this IServiceProvider serviceProvider)
+        {
+            return (T)serviceProvider.GetService(typeof (T));
+        }
     }
 }

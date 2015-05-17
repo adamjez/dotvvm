@@ -34,7 +34,7 @@ namespace Redwood.Framework.Runtime
         /// </summary>
         public DefaultViewModelSerializer(RedwoodConfiguration configuration)
         {
-            this.viewModelProtector = configuration.ServiceLocator.GetService<IViewModelProtector>();
+            this.viewModelProtector = configuration.ServiceProvider.GetService<IViewModelProtector>();
             this.JsonFormatting = configuration.Debug ? Formatting.Indented : Formatting.None;
         }
 

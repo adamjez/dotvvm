@@ -34,11 +34,11 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public RedwoodPresenter(RedwoodConfiguration configuration)
         {
-            RedwoodViewBuilder = configuration.ServiceLocator.GetService<IRedwoodViewBuilder>();
-            ViewModelLoader = configuration.ServiceLocator.GetService<IViewModelLoader>();
-            ViewModelSerializer = configuration.ServiceLocator.GetService<IViewModelSerializer>();
-            OutputRenderer = configuration.ServiceLocator.GetService<IOutputRenderer>();
-            CsrfProtector = configuration.ServiceLocator.GetService<ICsrfProtector>();
+            RedwoodViewBuilder = configuration.ServiceProvider.GetService<IRedwoodViewBuilder>();
+            ViewModelLoader = configuration.ServiceProvider.GetService<IViewModelLoader>();
+            ViewModelSerializer = configuration.ServiceProvider.GetService<IViewModelSerializer>();
+            OutputRenderer = configuration.ServiceProvider.GetService<IOutputRenderer>();
+            CsrfProtector = configuration.ServiceProvider.GetService<ICsrfProtector>();
         }
 
         /// <summary>

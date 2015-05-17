@@ -60,6 +60,13 @@ namespace Redwood.Framework.Controls
             get { return (string)GetValue(IDProperty); }
             set { SetValue(IDProperty, value); }
         }
+
+
+        internal RedwoodRequestContext GetRequestContext()
+        {
+            return GetValue(Internal.RequestContextProperty) as RedwoodRequestContext;
+        }
+
         public static readonly RedwoodProperty IDProperty =
             RedwoodProperty.Register<string, RedwoodControl>(c => c.ID, isValueInherited: false);
 

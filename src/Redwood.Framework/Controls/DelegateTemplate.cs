@@ -14,7 +14,7 @@ namespace Redwood.Framework.Controls
 
         public void BuildContent(RedwoodRequestContext context, RedwoodControl container)
         {
-            var controlBuilderFactory = context.Configuration.ServiceLocator.GetService<IControlBuilderFactory>();
+            var controlBuilderFactory = context.Configuration.ServiceProvider.GetService<IControlBuilderFactory>();
             var control = BuildContentBody(controlBuilderFactory);
             container.Children.Add(control);
         }

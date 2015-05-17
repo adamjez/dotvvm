@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using Redwood.Framework.Controls;
 
 namespace Redwood.Framework.Binding
 {
@@ -43,7 +44,7 @@ namespace Redwood.Framework.Binding
             var resourceKey = Expression.Substring(lastDotPosition + 1);
 
             // find the resource manager
-            var resourceManager = cachedResourceManagers.GetOrAdd(resourceType, GetResourceManager);
+            var resourceManager = cachedResourceManagers.GetOrAdd(resourceType, rt => GetResourceManager(rt, control));
 
             // return the value
             return resourceManager.GetString(resourceKey);
@@ -52,10 +53,10 @@ namespace Redwood.Framework.Binding
         /// <summary>
         /// Gets the resource manager with the specified type name.
         /// </summary>
-        private ResourceManager GetResourceManager(string resourceType)
+        private ResourceManager GetResourceManager(string resourceType, RedwoodControl control)
         {
             var typeName = resourceType;
-            var type = AppDomain.CurrentDomain.GetAssemblies()
+            var type = control.GetRequestContext().Configuration.AssemblyHelper.GetAllAssemblies()
                 .SelectMany(assembly => new[] {
                     assembly.GetType(typeName),     // the binding can contain full type name
                     assembly.GetType(assembly.GetName().Name + "." + resourceType)      // or the default namespace (which is typically same as assembly name) is omitted

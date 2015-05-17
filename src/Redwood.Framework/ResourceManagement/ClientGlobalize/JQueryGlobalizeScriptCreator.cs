@@ -140,52 +140,63 @@ namespace Redwood.Framework.ResourceManagement.ClientGlobalize
             return jobj;
         }
 
-        private static JObject CreateDateInfoJson(DateTimeFormatInfo di)
+        private static JObject CreateDateInfoJson(DateTimeFormatInfo formatInfo)
         {
             var obj = new
             {
-                firstDay = di.FirstDayOfWeek,
+                firstDay = formatInfo.FirstDayOfWeek,
                 days = new
                 {
-                    names = di.DayNames,
-                    namesAbbr = di.AbbreviatedDayNames,
-                    namesShort = di.ShortestDayNames
+                    names = formatInfo.DayNames,
+                    namesAbbr = formatInfo.AbbreviatedDayNames,
+                    namesShort = formatInfo.ShortestDayNames
                 },
                 months = new
                 {
-                    names = di.MonthNames,
-                    namesAbbr = di.AbbreviatedMonthNames
+                    names = formatInfo.MonthNames,
+                    namesAbbr = formatInfo.AbbreviatedMonthNames
                 },
-                AM = di.AMDesignator,
-                PM = di.PMDesignator,
-                eras = di.Calendar.Eras.Select(era => new { offset = 0, start = (string)null, name = di.GetEraName(era) }).ToArray(),
-                twoDigitYearMax = di.Calendar.TwoDigitYearMax,
+                AM = formatInfo.AMDesignator,
+                PM = formatInfo.PMDesignator,
+                eras = formatInfo.Calendar.Eras.Select(era => new { offset = 0, start = (string)null, name = formatInfo.GetEraName(era) }).ToArray(),
+                twoDigitYearMax = formatInfo.Calendar.TwoDigitYearMax,
                 patterns = new
                 {
-                    d = di.ShortDatePattern,
-                    D = di.LongDatePattern,
-                    t = di.ShortTimePattern,
-                    T = di.LongTimePattern,
-                    f = di.LongDatePattern + " " + di.ShortTimePattern,
-                    F = di.LongDatePattern + " " + di.LongTimePattern,
-                    M = di.MonthDayPattern,
-                    Y = di.YearMonthPattern,
+                    d = formatInfo.ShortDatePattern,
+                    D = formatInfo.LongDatePattern,
+                    t = formatInfo.ShortTimePattern,
+                    T = formatInfo.LongTimePattern,
+                    f = formatInfo.LongDatePattern + " " + formatInfo.ShortTimePattern,
+                    F = formatInfo.LongDatePattern + " " + formatInfo.LongTimePattern,
+                    M = formatInfo.MonthDayPattern,
+                    Y = formatInfo.YearMonthPattern,
                 }
             };
             var jobj = JObject.FromObject(obj);
-            jobj["/"] = di.DateSeparator;
-            jobj[":"] = di.TimeSeparator;
-            if (!di.MonthNames.SequenceEqual(di.MonthGenitiveNames))
+            jobj["/"] = GetDateSeparator(formatInfo);
+            jobj[":"] = GetTimeSeparator(formatInfo);
+            if (!formatInfo.MonthNames.SequenceEqual(formatInfo.MonthGenitiveNames))
             {
                 var monthsGenitive = jobj["monthsGenitive"] = new JObject();
-                monthsGenitive["names"] = JArray.FromObject(di.MonthGenitiveNames);
-                monthsGenitive["namesAbbr"] = JArray.FromObject(di.AbbreviatedMonthGenitiveNames);
+                monthsGenitive["names"] = JArray.FromObject(formatInfo.MonthGenitiveNames);
+                monthsGenitive["namesAbbr"] = JArray.FromObject(formatInfo.AbbreviatedMonthGenitiveNames);
             }
             return new JObject()
             {
                 {"standard", jobj }
             };
         }
+
+        private static string GetDateSeparator(DateTimeFormatInfo formatInfo)
+        {
+            return DateTime.MinValue.ToString("%/", formatInfo);
+        }
+
+        private static string GetTimeSeparator(DateTimeFormatInfo formatInfo)
+        {
+            return DateTime.MinValue.ToString("%:", formatInfo);
+        }
+
         public static JObject BuildCultureInfoJson(CultureInfo ci)
         {
             var cultureInfoClientObj = new
@@ -194,7 +205,7 @@ namespace Redwood.Framework.ResourceManagement.ClientGlobalize
                 nativeName = ci.NativeName,
                 englishName = ci.EnglishName,
                 isRTL = ci.TextInfo.IsRightToLeft,
-                language = ci.IetfLanguageTag
+                language = ci.Name
             };
             var jobj = JObject.FromObject(cultureInfoClientObj);
 

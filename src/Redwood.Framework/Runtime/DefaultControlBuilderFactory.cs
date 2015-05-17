@@ -26,8 +26,8 @@ namespace Redwood.Framework.Runtime
         {
             this.configuration = configuration;
 
-            ViewCompilerFactory = () => configuration.ServiceLocator.GetService<IViewCompiler>();
-            markupFileLoader = configuration.ServiceLocator.GetService<IMarkupFileLoader>(); 
+            ViewCompilerFactory = () => configuration.ServiceProvider.GetService<IViewCompiler>();
+            markupFileLoader = configuration.ServiceProvider.GetService<IMarkupFileLoader>(); 
         }
 
 

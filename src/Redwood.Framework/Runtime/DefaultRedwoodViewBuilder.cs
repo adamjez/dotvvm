@@ -27,8 +27,8 @@ namespace Redwood.Framework.Runtime
         /// </summary>
         public DefaultRedwoodViewBuilder(RedwoodConfiguration configuration)
         {
-            markupFileLoader = configuration.ServiceLocator.GetService<IMarkupFileLoader>();
-            controlBuilderFactory = configuration.ServiceLocator.GetService<IControlBuilderFactory>();
+            markupFileLoader = configuration.ServiceProvider.GetService<IMarkupFileLoader>();
+            controlBuilderFactory = configuration.ServiceProvider.GetService<IControlBuilderFactory>();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Redwood.Framework.Runtime
 
             // build the page
             var pageBuilder = controlBuilderFactory.GetControlBuilder(markup);
-            var contentPage = pageBuilder.BuildControl(controlBuilderFactory) as RedwoodView;
+            var contentPage = (RedwoodView)pageBuilder.BuildControl(controlBuilderFactory);
 
             // check for master page and perform composition recursively
             while (IsNestedInMasterPage(contentPage))
@@ -56,6 +56,9 @@ namespace Redwood.Framework.Runtime
 
             // verifies the SPA request
             VerifySpaRequest(context, contentPage);
+
+            // link the top-level control to the request
+            contentPage.SetValue(Internal.RequestContextProperty, context);
 
             return contentPage;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Redwood.Framework.Binding;
+using Redwood.Framework.Hosting;
 
 namespace Redwood.Framework.Controls
 {
@@ -20,5 +21,8 @@ namespace Redwood.Framework.Controls
 
         public static readonly RedwoodProperty IsControlBindingTargetProperty =
             RedwoodProperty.Register<bool, Internal>("IsControlBindingTarget", defaultValue: false, isValueInherited: false);
+
+        public static readonly RedwoodProperty RequestContextProperty =
+            RedwoodProperty.Register<RedwoodRequestContext, Internal>("RequestContextProperty", false, isValueInherited: true);
     }
 }

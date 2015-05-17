@@ -231,16 +231,9 @@ namespace Redwood.Framework.ViewModel
             return ex.Compile();
         }
 
-        private static readonly string RedwoodAssemblyName = typeof(ViewModelSerializationMap).GetTypeInfo().Assembly.FullName;
         private bool ShouldCheckEncrypedValueCount(Type type)
         {
-            return !(
-                type.GetTypeInfo().IsPrimitive ||
-                type == typeof(string) ||
-                (typeof(IEnumerable<>).IsAssignableFrom(type) && ShouldCheckEncrypedValueCount(type.GenericTypeArguments[0])) ||
-                (type.GetTypeInfo().Assembly.GetReferencedAssemblies().All(a => a.FullName != RedwoodAssemblyName) &&
-                    !type.GenericTypeArguments.Any(ShouldCheckEncrypedValueCount))
-           );
+            return true;
         }
 
     }

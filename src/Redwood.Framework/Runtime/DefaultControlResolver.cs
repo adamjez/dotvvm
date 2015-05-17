@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Microsoft.Framework.Runtime;
 using Redwood.Framework.Binding;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Controls;
@@ -33,7 +34,7 @@ namespace Redwood.Framework.Runtime
         public DefaultControlResolver(RedwoodConfiguration configuration)
         {
             this.configuration = configuration;
-            this.controlBuilderFactory = configuration.ServiceLocator.GetService<IControlBuilderFactory>();
+            this.controlBuilderFactory = configuration.ServiceProvider.GetService<IControlBuilderFactory>();
 
             if (!isInitialized)
             {
@@ -53,10 +54,14 @@ namespace Redwood.Framework.Runtime
         /// </summary>
         private void InvokeStaticConstructorsOnAllControls()
         {
-            var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).Where(t => t.IsClass).ToList();
+            var allTypes = configuration.AssemblyHelper.GetAllAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.GetTypeInfo().IsClass)
+                .ToList();
+
             foreach (var type in allTypes)
             {
-                if (type.GetCustomAttribute<ContainsRedwoodPropertiesAttribute>(true) != null)
+                if (type.GetTypeInfo().GetCustomAttribute<ContainsRedwoodPropertiesAttribute>(true) != null)
                 {
                     RuntimeHelpers.RunClassConstructor(type.TypeHandle);
                 }

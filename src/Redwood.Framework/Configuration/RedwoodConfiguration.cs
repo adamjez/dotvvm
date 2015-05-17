@@ -15,18 +15,28 @@ using Redwood.Framework.Runtime.Compilation;
 using Redwood.Framework.Runtime.Filters;
 using Redwood.Framework.Security;
 using Redwood.Framework.ResourceManagement.ClientGlobalize;
+using Microsoft.AspNet.Hosting;
+using Microsoft.Framework.DependencyInjection;
 
 namespace Redwood.Framework.Configuration
 {
     public class RedwoodConfiguration
     {
         public const string RedwoodControlTagPrefix = "rw";
-        
+
         /// <summary>
         /// Gets or sets the application physical path.
         /// </summary>
         [JsonIgnore]
-        public string ApplicationPhysicalPath { get; set; }
+        public string ApplicationPhysicalPath
+        {
+            get { return HostingEnvironment.WebRootPath; }
+        }
+
+        /// <summary>
+        /// Gets the hosting environment instance.
+        /// </summary>
+        public IHostingEnvironment HostingEnvironment { get; internal set; }
 
         /// <summary>
         /// Gets the settings of the markup.
@@ -43,8 +53,7 @@ namespace Redwood.Framework.Configuration
         /// <summary>
         /// Gets the configuration of resources.
         /// </summary>
-        [JsonProperty("resources", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [JsonConverter(typeof(ResourceRepositoryJsonConverter))]
+        [JsonIgnore()]
         public RedwoodResourceRepository Resources { get; private set; }
 
         /// <summary>
@@ -70,12 +79,13 @@ namespace Redwood.Framework.Configuration
         /// </summary>
         [JsonProperty("debug", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool Debug { get; set; }
+        
 
         /// <summary>
-        /// Gets an instance of the service locator component.
+        /// Gets the service provider.
         /// </summary>
         [JsonIgnore]
-        public ServiceLocator ServiceLocator { get; private set; }
+        public IServiceProvider ServiceProvider { get; internal set; }
 
         /// <summary>
         /// Gets a virtual directory in which the application runs (e.g. "/myApp").
@@ -83,7 +93,7 @@ namespace Redwood.Framework.Configuration
         [JsonIgnore]
         public string VirtualDirectory { get; internal set; }
 
-
+        internal AssemblyHelper AssemblyHelper { get; set; }
 
 
         /// <summary>
@@ -106,19 +116,6 @@ namespace Redwood.Framework.Configuration
         public static RedwoodConfiguration CreateDefault()
         {
             var configuration = new RedwoodConfiguration();
-
-            configuration.ServiceLocator = new ServiceLocator();
-            configuration.ServiceLocator.RegisterSingleton<IViewModelProtector>(() => new DefaultViewModelProtector());
-            configuration.ServiceLocator.RegisterSingleton<ICsrfProtector>(() => new DefaultCsrfProtector());
-            configuration.ServiceLocator.RegisterSingleton<IRedwoodViewBuilder>(() => new DefaultRedwoodViewBuilder(configuration));
-            configuration.ServiceLocator.RegisterSingleton<IViewModelLoader>(() => new DefaultViewModelLoader());
-            configuration.ServiceLocator.RegisterSingleton<IViewModelSerializer>(() => new DefaultViewModelSerializer(configuration) { SendDiff = true });
-            configuration.ServiceLocator.RegisterSingleton<IOutputRenderer>(() => new DefaultOutputRenderer());
-            configuration.ServiceLocator.RegisterSingleton<IRedwoodPresenter>(() => new RedwoodPresenter(configuration));
-            configuration.ServiceLocator.RegisterSingleton<IMarkupFileLoader>(() => new DefaultMarkupFileLoader());
-            configuration.ServiceLocator.RegisterSingleton<IControlBuilderFactory>(() => new DefaultControlBuilderFactory(configuration));
-            configuration.ServiceLocator.RegisterSingleton<IControlResolver>(() => new DefaultControlResolver(configuration));
-            configuration.ServiceLocator.RegisterTransient<IViewCompiler>(() => new DefaultViewCompiler(configuration));
 
             configuration.Runtime.GlobalFilters.Add(new ModelValidationFilterAttribute());
             

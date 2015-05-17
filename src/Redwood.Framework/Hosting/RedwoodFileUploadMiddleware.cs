@@ -83,7 +83,7 @@ namespace Redwood.Framework.Hosting
 
         private async Task RenderResponse(HttpContext context, bool isPost, string errorMessage, List<UploadedFile> uploadedFiles)
         {
-            var outputRenderer = configuration.ServiceLocator.GetService<IOutputRenderer>();
+            var outputRenderer = configuration.ServiceProvider.GetService<IOutputRenderer>();
             if (isPost && context.Request.Headers.Get(Constants.RedwoodFileUploadAsyncHeaderName) == "true")
             {
                 // modern browser - return JSON
@@ -122,7 +122,7 @@ namespace Redwood.Framework.Hosting
         private async Task SaveFiles(HttpContext context, Group boundary, List<UploadedFile> uploadedFiles)
         {
             // get the file store
-            var fileStore = configuration.ServiceLocator.GetService<IUploadedFileStorage>();
+            var fileStore = configuration.ServiceProvider.GetService<IUploadedFileStorage>();
 
             // parse the stream
             var multiPartReader = new MultipartReader(boundary.Value, context.Request.Body);

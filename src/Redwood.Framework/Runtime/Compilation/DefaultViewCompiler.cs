@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.Framework.Runtime;
 using Redwood.Framework.Binding;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Controls;
@@ -25,7 +26,7 @@ namespace Redwood.Framework.Runtime.Compilation
         public DefaultViewCompiler(RedwoodConfiguration configuration)
         {
             this.configuration = configuration;
-            this.controlResolver = configuration.ServiceLocator.GetService<IControlResolver>();
+            this.controlResolver = configuration.ServiceProvider.GetService<IControlResolver>();
             this.assemblyCache = CompiledAssemblyCache.Instance;
         }
 
@@ -81,7 +82,7 @@ namespace Redwood.Framework.Runtime.Compilation
 
                 // create the assembly
                 var assembly = BuildAssembly(assemblyName, namespaceName, className);
-                var controlBuilder = (IControlBuilder)assembly.CreateInstance(namespaceName + "." + className);
+                var controlBuilder = (IControlBuilder)Activator.CreateInstance(Type.GetType(namespaceName + "." + className + ", " + assembly.FullName, true));
                 metadata.ControlBuilderType = controlBuilder.GetType();
                 return controlBuilder;
             }
@@ -123,15 +124,13 @@ namespace Redwood.Framework.Runtime.Compilation
         /// </summary>
         private Assembly BuildAssembly(string assemblyName, string namespaceName, string className)
         {
-            using (var ms = new MemoryStream())
-            {
                 // static references
                 var staticReferences = new[]
                 {
                     typeof(object).GetTypeInfo().Assembly,
                     typeof(RuntimeBinderException).GetTypeInfo().Assembly,
                     typeof(System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly,
-                    Assembly.GetExecutingAssembly()
+                    typeof(RedwoodConfiguration).GetTypeInfo().Assembly
                 }
                 .Concat(configuration.Markup.Assemblies.Select(a => Assembly.Load(new AssemblyName(a)))).Distinct()
                 .Select(MetadataReference.CreateFromAssembly);
@@ -148,17 +147,20 @@ namespace Redwood.Framework.Runtime.Compilation
                     Enumerable.Concat(staticReferences, dynamicReferences),
                     options);
 
-                var result = compilation.Emit(ms);
+            using (var assemblyStream = new MemoryStream())
+            using (var pdbStream = new MemoryStream())
+            {
+                var result = compilation.Emit(assemblyStream, pdbStream);
                 if (result.Success)
                 {
-                    var assembly = Assembly.Load(ms.ToArray());
+                    var assembly = configuration.AssemblyHelper.LoadAssembly(assemblyStream, pdbStream);
                     assemblyCache.AddAssembly(assembly, compilation.ToMetadataReference());
                     return assembly;
                 }
                 else
                 {
-                    throw new Exception("The compilation failed! This is most probably bug in the Redwood framework.\r\n\r\n" 
-                        + string.Join("\r\n", result.Diagnostics) 
+                    throw new Exception("The compilation failed! This is most probably bug in the Redwood framework.\r\n\r\n"
+                        + string.Join("\r\n", result.Diagnostics)
                         + "\r\n\r\n" + compilation.SyntaxTrees[0] + "\r\n\r\n");
                 }
             }
