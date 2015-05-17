@@ -24,8 +24,37 @@ module.exports = function (grunt) {
                     }
                 }
             }
+        },
+        
+        "resx_compile_task": {
+            compile: {
+                files: {
+                    "Resources/Controls.Designer.cs": {
+                        path: "Resources/Controls.resx",
+                        namespace: "Redwood.Framework.Resources",
+                        className: "Controls"
+                    },
+                    "Resources/Parser.RwHtml.Designer.cs": {
+                        path: "Resources/Parser.RwHtml.resx",
+                        namespace: "Redwood.Framework.Resources",
+                        className: "Parser_RwHtml"
+                    },
+                    "Resources/RwHtmlParserErrors.Designer.cs": {
+                        path: "Resources/RwHtmlParserErrors.resx",
+                        namespace: "Redwood.Framework.Resources",
+                        className: "RwHtmlParserErrors"
+                    },
+                    "Resources/RwHtmlTokenizerErrors.Designer.cs": {
+                        path: "Resources/RwHtmlTokenizerErrors.resx",
+                        namespace: "Redwood.Framework.Resources",
+                        className: "RwHtmlTokenizerErrors"
+                    }
+                }
+
+            }
         }
     });
 
     grunt.loadNpmTasks("grunt-runtime-t4-template-task");
+    grunt.loadNpmTasks("grunt-resx-compile-task");
 };
