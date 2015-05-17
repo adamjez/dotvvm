@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Web;
 using Redwood.Framework.Controls;
 using Redwood.Framework.Storage;
+using Redwood.Framework;
 
 namespace Redwood.Samples.BasicSamples.ViewModels
 {
@@ -29,7 +29,7 @@ namespace Redwood.Samples.BasicSamples.ViewModels
 
         public void Process()
         {
-            var storage = Context.Configuration.ServiceLocator.GetService<IUploadedFileStorage>();
+            var storage = Context.Configuration.ServiceProvider.GetService<IUploadedFileStorage>();
 
             var uploadPath = GetUploadPath();
 

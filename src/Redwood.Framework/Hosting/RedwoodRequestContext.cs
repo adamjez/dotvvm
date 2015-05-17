@@ -129,7 +129,11 @@ namespace Redwood.Framework.Hosting
         /// </summary>
         public void ChangeCurrentCulture(string cultureName)
         {
+#if DNXCORE50
             CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = new CultureInfo(cultureName);
+#else
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = new CultureInfo(cultureName);
+#endif
         }
 
         /// <summary>

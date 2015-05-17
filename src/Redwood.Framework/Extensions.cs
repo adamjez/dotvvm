@@ -27,7 +27,7 @@ namespace Redwood.Framework
 
         public static string GetAbsoluteUrl(this HttpRequest request)
         {
-            return request.Protocol.ToString() + request.Host.ToString() + request.GetPathAndQuery();
+            return request.Scheme.ToString() + "://" + request.Host.ToString() + request.GetPathAndQuery();
         }
 
         public static T GetService<T>(this IServiceProvider serviceProvider)

@@ -6,8 +6,9 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+#if DNXCORE50
 using Microsoft.CSharp.RuntimeBinder;
-using Microsoft.Framework.Runtime;
+#endif
 using Redwood.Framework.Binding;
 using Redwood.Framework.Configuration;
 using Redwood.Framework.Controls;
@@ -128,7 +129,9 @@ namespace Redwood.Framework.Runtime.Compilation
                 var staticReferences = new[]
                 {
                     typeof(object).GetTypeInfo().Assembly,
+#if DOTNETCORE50
                     typeof(RuntimeBinderException).GetTypeInfo().Assembly,
+#endif
                     typeof(System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly,
                     typeof(RedwoodConfiguration).GetTypeInfo().Assembly
                 }

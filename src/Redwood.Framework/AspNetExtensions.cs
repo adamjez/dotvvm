@@ -16,9 +16,8 @@ namespace Redwood.Framework
     public static class AspNetExtensions
     {
 
-        public static RedwoodConfiguration UseRedwood(this IApplicationBuilder app, IHostingEnvironment hostingEnvironment, Assembly mainApplicationAssembly = null, string virtualDirectory = "")
+        public static RedwoodConfiguration UseRedwood(this IApplicationBuilder app, RedwoodConfiguration configuration, IHostingEnvironment hostingEnvironment, Assembly mainApplicationAssembly = null, string virtualDirectory = "")
         {
-            
             if (virtualDirectory.StartsWith("/"))
             {
                 virtualDirectory = virtualDirectory.Substring(1);
@@ -27,7 +26,6 @@ namespace Redwood.Framework
             var configurationFilePath = Path.Combine(hostingEnvironment.WebRootPath, "redwood.json");
             
             // load or create default configuration
-            var configuration = RedwoodConfiguration.CreateDefault();
             if (File.Exists(configurationFilePath))
             {
                 var fileContents = File.ReadAllText(configurationFilePath);

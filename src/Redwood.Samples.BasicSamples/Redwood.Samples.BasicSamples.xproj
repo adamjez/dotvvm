@@ -6,14 +6,14 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>f83dc336-ee2b-4c8d-9c6a-22ecfa9a014f</ProjectGuid>
-    <RootNamespace>Redwood.Framework.CoreFx</RootNamespace>
+    <ProjectGuid>5e29956e-b052-456c-98cd-d9a1186c771e</ProjectGuid>
+    <RootNamespace>Redwood.Samples.BasicSamples</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-    <GruntGulpQueried>True</GruntGulpQueried>
+    <DevelopmentServerPort>59572</DevelopmentServerPort>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>
