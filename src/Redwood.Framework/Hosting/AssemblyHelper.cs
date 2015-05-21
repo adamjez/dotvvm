@@ -18,14 +18,14 @@ namespace Redwood.Framework.Hosting
         public AssemblyHelper(RedwoodConfiguration configuration)
         {
             this.configuration = configuration;
-            AssemblyLoadContext = configuration.ServiceProvider.GetService<IAssemblyLoadContext>();
+            AssemblyLoadContext = configuration.ServiceProvider.GetService<IAssemblyLoadContextAccessor>().Default;
             LibraryManager = configuration.ServiceProvider.GetService<ILibraryManager>();
         }
 
 
         public IEnumerable<Assembly> GetAllAssemblies()
         {
-            return LibraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies.Select(Assembly.Load));
+            return Enumerable.Empty<Assembly>();
         }
 
         public Assembly LoadAssembly(Stream assemblyStream, Stream pdbStream)
