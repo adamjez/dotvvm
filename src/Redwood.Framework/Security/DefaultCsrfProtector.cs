@@ -84,46 +84,48 @@ namespace Redwood.Framework.Security
             // Get cookie value
             var sidCookieValue = mgr.GetRequestCookie(context.HttpContext, context.Configuration.Security.SessionIdCookieName);
 
-            if (string.IsNullOrWhiteSpace(sidCookieValue))
-            {
-                // No SID - generate and protect new one
-                var sid = new byte[SID_LENGTH];
-                using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-                {
-                    rng.GetBytes(sid);
-                }
-                var protectedSid = keyHelper.ProtectData(sid, KDF_LABEL_SID);
-
-                // Save to cookie
-                sidCookieValue = Convert.ToBase64String(protectedSid);
-                mgr.AppendResponseCookie(
-                    context.HttpContext,
-                    context.Configuration.Security.SessionIdCookieName, // Configured cookie name
-                    sidCookieValue,                                     // Base64-encoded SID value
-                    new CookieOptions
-                    {
-                        HttpOnly = true,                                // Don't allow client script access
-                        Secure = context.HttpContext.Request.IsHttps   // If request goes trough HTTPS, mark as secure only
-                    });
-
-                // Return newly generated SID
-                return sid;
-            }
-            else
+            byte[] protectedSid, sid;
+            if (!string.IsNullOrWhiteSpace(sidCookieValue))
             {
                 // Try to read from cookie
                 try
                 {
-                    var protectedSid = Convert.FromBase64String(sidCookieValue);
-                    var sid = keyHelper.UnprotectData(protectedSid, KDF_LABEL_SID);
+                    protectedSid = Convert.FromBase64String(sidCookieValue);
+                    sid = keyHelper.UnprotectData(protectedSid, KDF_LABEL_SID);
                     return sid;
                 }
                 catch (Exception ex)
                 {
-                    // Incorrect Base64 formatting of crypto protection error
-                    throw new SecurityException("Value of the SessionID cookie is corrupted or has been tampered with.", ex);
+                    if (context.IsPostBack)
+                    {
+                        // Incorrect Base64 formatting of crypto protection error - throw on postback, regenerate SID on GET
+                        throw new SecurityException("Value of the SessionID cookie is corrupted or has been tampered with.", ex);
+                    }
                 }
             }
+
+            // No SID - generate and protect new one
+            sid = new byte[SID_LENGTH];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(sid);
+            }
+            protectedSid = keyHelper.ProtectData(sid, KDF_LABEL_SID);
+
+            // Save to cookie
+            sidCookieValue = Convert.ToBase64String(protectedSid);
+            mgr.AppendResponseCookie(
+                context.HttpContext,
+                context.Configuration.Security.SessionIdCookieName, // Configured cookie name
+                sidCookieValue, // Base64-encoded SID value
+                new CookieOptions
+                {
+                    HttpOnly = true, // Don't allow client script access
+                    Secure = context.HttpContext.Request.IsHttps // If request goes trough HTTPS, mark as secure only
+                });
+
+            // Return newly generated SID
+            return sid;
         }
 
     }

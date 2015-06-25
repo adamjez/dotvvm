@@ -28,18 +28,15 @@ namespace Redwood.Framework.Runtime.Compilation
         {
             this.configuration = configuration;
             this.controlResolver = configuration.ServiceProvider.GetService<IControlResolver>();
-            this.assemblyCache = CompiledAssemblyCache.Instance;
+            this.assemblyMetadataCache = configuration.ServiceProvider.GetService<IAssemblyMetadataCache>();
         }
 
-
-        private readonly CompiledAssemblyCache assemblyCache;
+        private readonly IAssemblyMetadataCache assemblyMetadataCache;
         private readonly IControlResolver controlResolver;
         private readonly RedwoodConfiguration configuration;
 
         private DefaultViewCompilerCodeEmitter emitter;
         private int currentTemplateIndex = 0;
-
-
 
         /// <summary>
         /// Compiles the view and returns a function that can be invoked repeatedly. The function builds full control tree and activates the page.
@@ -71,7 +68,7 @@ namespace Redwood.Framework.Runtime.Compilation
                 }
 
                 var directivesToApply = node.Directives.Where(d => d.Name != Constants.BaseTypeDirective).ToList();
-                if (wrapperType.IsAssignableFrom(typeof (RedwoodView)))
+                if (wrapperType.IsAssignableFrom(typeof(RedwoodView)))
                 {
                     foreach (var directive in directivesToApply)
                     {
@@ -83,7 +80,8 @@ namespace Redwood.Framework.Runtime.Compilation
 
                 // create the assembly
                 var assembly = BuildAssembly(assemblyName, namespaceName, className);
-                var controlBuilder = (IControlBuilder)Activator.CreateInstance(Type.GetType(namespaceName + "." + className + ", " + assembly.FullName, true));
+                var viewType = assembly.GetType(namespaceName + "." + className);
+                var controlBuilder = (IControlBuilder)Activator.CreateInstance(viewType);
                 metadata.ControlBuilderType = controlBuilder.GetType();
                 return controlBuilder;
             }
@@ -94,7 +92,7 @@ namespace Redwood.Framework.Runtime.Compilation
         /// </summary>
         private Type ResolveWrapperType(RwHtmlRootNode node, string className, out string controlClassName)
         {
-            var wrapperType = typeof (RedwoodView);
+            var wrapperType = typeof(RedwoodView);
 
             var baseControlDirective = node.Directives.SingleOrDefault(d => d.Name == Constants.BaseTypeDirective);
             if (baseControlDirective != null)
@@ -104,7 +102,7 @@ namespace Redwood.Framework.Runtime.Compilation
                 {
                     throw new Exception(string.Format(Resources.Controls.ViewCompiler_TypeSpecifiedInBaseTypeDirectiveNotFound, baseControlDirective.Value));
                 }
-                if (!typeof (RedwoodMarkupControl).IsAssignableFrom(wrapperType))
+                if (!typeof(RedwoodMarkupControl).IsAssignableFrom(wrapperType))
                 {
                     throw new Exception(string.Format(Resources.Controls.ViewCompiler_MarkupControlMustDeriveFromRedwoodMarkupControl));
                 }
@@ -118,46 +116,52 @@ namespace Redwood.Framework.Runtime.Compilation
             }
 
             return wrapperType;
-        } 
+        }
 
         /// <summary>
         /// Builds the assembly.
         /// </summary>
         private Assembly BuildAssembly(string assemblyName, string namespaceName, string className)
         {
-                // static references
-                var staticReferences = new[]
-                {
-                    typeof(object).GetTypeInfo().Assembly,
+            // static references
+            var staticReferences = new[]
+            {
+                typeof (object).GetTypeInfo().Assembly,
 #if DOTNETCORE50
-                    typeof(RuntimeBinderException).GetTypeInfo().Assembly,
+                typeof(RuntimeBinderException).GetTypeInfo().Assembly,
 #endif
-                    typeof(System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly,
-                    typeof(RedwoodConfiguration).GetTypeInfo().Assembly
-                }
-                .Concat(configuration.Markup.Assemblies.Select(a => Assembly.Load(new AssemblyName(a)))).Distinct()
-                .Select(MetadataReference.CreateFromAssembly);
-                
-                // add dynamic references
-                var dynamicReferences = emitter.UsedControlBuilderTypes.Select(t => t.GetTypeInfo().Assembly).Concat(emitter.UsedAssemblies).Distinct()
-                    .Select(a => assemblyCache.GetAssemblyMetadata(a));
+                typeof (System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly,
+                typeof (RedwoodConfiguration).GetTypeInfo().Assembly
+            }
+                .Concat(configuration.Markup.Assemblies.Select(a => Assembly.Load(new AssemblyName(a))))
+                .Distinct();
 
-                // compile
-                var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-                var compilation = CSharpCompilation.Create(
-                    assemblyName, 
-                    emitter.BuildTree(namespaceName, className), 
-                    Enumerable.Concat(staticReferences, dynamicReferences),
-                    options);
+            // add dynamic references
+            var dynamicReferences = emitter.UsedControlBuilderTypes
+                .Select(t => t.GetTypeInfo().Assembly)
+                .Concat(emitter.UsedAssemblies)
+                .Distinct();
 
+            // compile
+            var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            
+            var compilation = CSharpCompilation.Create(
+                assemblyName,
+                emitter.BuildTree(namespaceName, className),
+                Enumerable.Concat(staticReferences, dynamicReferences).Select(a => assemblyMetadataCache.GetAssemblyMetadata(a)),
+                options);
+             
             using (var assemblyStream = new MemoryStream())
             using (var pdbStream = new MemoryStream())
             {
                 var result = compilation.Emit(assemblyStream, pdbStream);
                 if (result.Success)
                 {
+                    assemblyStream.Position = 0;
+                    pdbStream.Position = 0;
+
                     var assembly = configuration.AssemblyHelper.LoadAssembly(assemblyStream, pdbStream);
-                    assemblyCache.AddAssembly(assembly, compilation.ToMetadataReference());
+                    assemblyMetadataCache.AddAssembly(assembly, compilation.ToMetadataReference());
                     return assembly;
                 }
                 else
@@ -168,6 +172,8 @@ namespace Redwood.Framework.Runtime.Compilation
                 }
             }
         }
+
+
 
         /// <summary>
         /// Processes the node.
@@ -208,7 +214,7 @@ namespace Redwood.Framework.Runtime.Compilation
                 else
                 {
                     EnsureContentAllowed(parentMetadata);
-                    
+
                     // the element is the content
                     var currentObjectName = ProcessObjectElement(element);
                     emitter.EmitAddCollectionItem(parentName, currentObjectName);

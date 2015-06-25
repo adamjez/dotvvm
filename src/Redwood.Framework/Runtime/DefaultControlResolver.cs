@@ -54,18 +54,22 @@ namespace Redwood.Framework.Runtime
         /// </summary>
         private void InvokeStaticConstructorsOnAllControls()
         {
-            //var allTypes = configuration.AssemblyHelper.GetAllAssemblies()
-            //    .SelectMany(a => a.GetTypes())
-            //    .Where(t => t.GetTypeInfo().IsClass)
-            //    .ToList();
-            
-            //foreach (var type in allTypes)
-            //{
-            //    if (type.GetTypeInfo().GetCustomAttribute<ContainsRedwoodPropertiesAttribute>(true) != null)
-            //    {
-            //        RuntimeHelpers.RunClassConstructor(type.TypeHandle);
-            //    }
-            //}
+            foreach (var assembly in configuration.AssemblyHelper.GetAllAssemblies())
+            {
+                try
+                {
+                    foreach (var type in assembly.GetTypes().Where(t => t.GetTypeInfo().IsClass))
+                    {
+                        if (type.GetTypeInfo().GetCustomAttribute<ContainsRedwoodPropertiesAttribute>(true) != null)
+                        {
+                            RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
         }
 
 

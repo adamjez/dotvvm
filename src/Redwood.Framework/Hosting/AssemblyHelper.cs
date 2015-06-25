@@ -25,7 +25,18 @@ namespace Redwood.Framework.Hosting
 
         public IEnumerable<Assembly> GetAllAssemblies()
         {
-            return Enumerable.Empty<Assembly>();
+            return LibraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies).Select(a =>
+            {
+                try
+                {
+                    return Assembly.Load(a);
+                }
+                catch (FileNotFoundException)
+                {
+                    return null;
+                }
+            })
+            .Where(a => a != null);
         }
 
         public Assembly LoadAssembly(Stream assemblyStream, Stream pdbStream)

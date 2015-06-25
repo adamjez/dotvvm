@@ -67,6 +67,7 @@ namespace Redwood.Framework
             serviceCollection.AddSingleton<IMarkupFileLoader>(provider => new DefaultMarkupFileLoader());
             serviceCollection.AddSingleton<IControlBuilderFactory>(provider => new DefaultControlBuilderFactory(configuration));
             serviceCollection.AddSingleton<IControlResolver>(provider => new DefaultControlResolver(configuration));
+            serviceCollection.AddSingleton<IAssemblyMetadataCache>(provider => new AssemblyMetadataCache(configuration));
             serviceCollection.AddTransient<IViewCompiler>(provider => new DefaultViewCompiler(configuration));
         }
            

@@ -130,8 +130,8 @@ namespace Redwood.Framework.ViewModel
                                 levc - ev.Count != (int)GetAndRemove(ev, 0), lastEVcount, encryptedValues),
                             Expression.Throw(Expression.New(typeof(System.Security.SecurityException)))
                         ));
+                    }
                 }
-            }
             }
 
             block.Add(value);
@@ -169,7 +169,7 @@ namespace Redwood.Framework.ViewModel
 
             // usedMaps.Add(serializationMap);
             block.Add(ExpressionUtils.Replace((HashSet<ViewModelSerializationMap> ut, ViewModelSerializationMap sm) => ut.Add(sm), usedTypes, serializationMap));
-            
+
             // value = ({Type})valueParam;
             block.Add(Expression.Assign(value, Expression.Convert(valueParam, Type)));
             block.Add(Expression.Call(writer, "WriteStartObject", Type.EmptyTypes));

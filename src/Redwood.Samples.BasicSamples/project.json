@@ -6,7 +6,8 @@
   "dependencies": {
     "Microsoft.AspNet.Server.IIS": "1.0.0-beta4",
     "Microsoft.AspNet.Server.WebListener": "1.0.0-beta4",
-    "Redwood.Framework": "1.0.0-*"
+    "Redwood.Framework": "1.0.0-*",
+    "Newtonsoft.Json": "7.0.1"
   },
 
   "commands": {
