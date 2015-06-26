@@ -103,7 +103,7 @@ namespace Redwood.Framework.ViewModel
                 }
                 else
                 {
-                    var checkEVCount = ShouldCheckEncrypedValueCount(property.Type);
+                    var checkEVCount = property.TransferToClient && ShouldCheckEncrypedValueCount(property.Type);
                     if (checkEVCount)
                     {
                         // lastEncrypedValuesCount = encrypedValues.Count
@@ -203,7 +203,7 @@ namespace Redwood.Framework.ViewModel
 
                 if (property.ViewModelProtection == ViewModelProtectionSettings.None || property.ViewModelProtection == ViewModelProtectionSettings.SignData)
                 {
-                    var checkEVCount = ShouldCheckEncrypedValueCount(property.Type);
+                    var checkEVCount = property.TransferToServer && ShouldCheckEncrypedValueCount(property.Type);
                     if (checkEVCount)
                     {
                         // lastEncrypedValuesCount = encrypedValues.Count
