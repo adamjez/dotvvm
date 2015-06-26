@@ -125,6 +125,8 @@ namespace Redwood.Framework.ViewModel
 
                     if (checkEVCount)
                     {
+                        // if (lastEVcount - encryptedValues.Count != (int)GetAndRemove(encryptedValues, 0))
+                        //     throw new SecurityException();
                         block.Add(Expression.IfThen(
                             ExpressionUtils.Replace((int levc, JArray ev) =>
                                 levc - ev.Count != (int)GetAndRemove(ev, 0), lastEVcount, encryptedValues),
@@ -233,7 +235,7 @@ namespace Redwood.Framework.ViewModel
 
         private bool ShouldCheckEncrypedValueCount(Type type)
         {
-            return true;
+            return !ViewModelJsonConverter.IsPrimitiveType(type);
         }
 
     }
